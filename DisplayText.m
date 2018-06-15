@@ -1,9 +1,14 @@
-function [vbl] = DisplayText(window, textToShow, nextPrompt, color)
-    if nextPrompt
-        textToShow = strcat(textToShow, '\n\n(Press any key to continue)');
+function [vbl] = DisplayText(window, duration, text, color)
+    if duration == 0
+        text = strcat(text, '\n\n(Press any key to continue)');
     end
     
-    DrawFormattedText(window, textToShow, 'center', 'center', color);
+    DrawFormattedText(window, text, 'center', 'center', color);
     vbl = Screen('Flip', window);
-    KbStrokeWait;
+    
+    if duration == 0
+        KbStrokeWait;
+    else
+        WaitSecs(duration);
+    end
 end
