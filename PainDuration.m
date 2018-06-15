@@ -1,13 +1,13 @@
+% Clear workspace
+close all;
+clearvars;
+sca;
+
 % PARAMETERS
 % ===
 
 instTextSize = 40;
 loopTextSize = 60;
-
-% Clear workspace
-close all;
-clearvars;
-sca;
 
 % Setup PTB with some default values
 PsychDefaultSetup(2);
@@ -46,8 +46,13 @@ Priority(topPriorityLevel);
 
 Screen('TextSize', window, instTextSize);
 
+instText = {...
+    'First';...
+    'Second'};
 % TODO: actual instructions text
-vbl = DisplayText(window, 0, 'Instructions', white);
+for instScreen = 1:length(instText)
+    vbl = DisplayText(window, 0, char(instText(instScreen)), white);
+end
 
 % PARAMETERS
 % ===
@@ -59,12 +64,16 @@ Ntrials = 4;
 Rmax = 100 * ones(Ntrials, 1);
 Tmax = 5 * ones(Ntrials, 1);
 Itrial = 1.5 * ones(Ntrials, 1);
+
+Tabs = zeros(Ntrials, 1);
 Ttrial = zeros(Ntrials, 1);
 
 % EXPERIMENT LOOP
 % ===
 
 Screen('TextSize', window, loopTextSize);
+
+T0abs = GetSecs;
 
 for trial = 1:Ntrials
     
@@ -76,7 +85,7 @@ for trial = 1:Ntrials
     
     Tdelta = 0;
     Rtrial = 0;
-    Tnot = GetSecs;
+    T0 = GetSecs;
     TmaxN = Tmax(trial);
     RmaxN = Rmax(trial);
     
@@ -85,7 +94,7 @@ for trial = 1:Ntrials
     
     while Tdelta < TmaxN && ~KbCheck
         % calculate elapsed time and percentage completion
-        Tdelta = GetSecs - Tnot;
+        Tdelta = GetSecs - T0;
         Tratio = min( (Tdelta/TmaxN) , 1);
         Rtrial = RmaxN * Tratio;
 
@@ -105,10 +114,12 @@ for trial = 1:Ntrials
     % calculate one last time directly after button press for most accuracy
     % otherwise data will be dependent on resolution/jitter of monitor
     % refresh rate
-    Tdelta = GetSecs - Tnot;
+    Tdelta = GetSecs - T0;
     Tratio = min( (Tdelta/TmaxN) , 1);
     Rtrial = RmaxN * Tratio;
+    
     Ttrial(trial) = Tdelta;
+    Tabs(trial) = T0 - T0abs;
 
     % show reward earned for this trial
     rewardText = ['Reward earned: ', sprintf('$%.2f', Rtrial)];
